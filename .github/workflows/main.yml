@@ -13,10 +13,6 @@ concurrency:
   group: "pages"
   cancel-in-progress: true
 
-defaults:
-  run:
-    working-directory: locline-principal # Isso avisa ao robô para entrar na sua pasta!
-
 jobs:
   deploy:
     environment:
@@ -24,20 +20,27 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout codigo
         uses: actions/checkout@v4
-      - name: Set up Node
+
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
+
+      - name: Instalar dependencias na pasta certa
         run: npm install
-      - name: Build
+        working-directory: ./locline-principal
+
+      - name: Compilar o projeto (Build)
         run: npm run build
-      - name: Upload artifact
+        working-directory: ./locline-principal
+
+      - name: Enviar os arquivos gerados
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./locline-principal/dist # Caminho ajustado para a pasta dist
-      - name: Deploy to GitHub Pages
+          path: ./locline-principal/dist
+
+      - name: Publicar no GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
