@@ -39,7 +39,7 @@ jobs:
       - name: Enviar os arquivos gerados
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./locline-main/dist
+          path: ./dist # Ajustado para encontrar a pasta correta gerada pelo compilador
 
       - name: Publicar no GitHub Pages
         id: deployment
