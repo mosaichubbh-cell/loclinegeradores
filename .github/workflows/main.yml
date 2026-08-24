@@ -1,4 +1,4 @@
-name: Teste de Caminho
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -6,13 +6,41 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  diagnostico:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout codigo
         uses: actions/checkout@v4
 
-      - name: Listar Diretorios
-        run: ls -la
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+        working-directory: ./locline-main
+
+      - name: Compilar o projeto (Build)
+        run: npm run build
+        working-directory: ./locline-main
+
+      - name: Enviar os arquivos gerados
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./locline-main/dist
+
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
